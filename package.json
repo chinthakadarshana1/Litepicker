@@ -5,7 +5,7 @@
   "main": "./dist/litepicker.umd.js",
   "types": "./dist/types/index.d.ts",
   "scripts": {
-    "prod": "webpack --config config/webpack.prod.js",
+    "prod": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --config config/webpack.prod.js",
     "dev": "webpack --config config/webpack.dev.js",
     "nocss": "webpack --config config/webpack.nocss.js",
     "plugins": "webpack --config config/webpack.plugins.js && webpack --config config/webpack.plugins.nocss.js",
@@ -43,6 +43,7 @@
     "@types/node": "^12.12.7",
     "autoprefixer": "^9.7.2",
     "babel-loader": "^8.2.2",
+    "cross-env": "^7.0.3",
     "css-loader": "^3.6.0",
     "dts-css-modules-loader": "^1.0.1",
     "eslint": "^7.3.1",

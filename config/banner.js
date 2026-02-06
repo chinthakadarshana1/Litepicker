@@ -1,17 +1,13 @@
-const getPackageJson = require('./getPackageJson');
+const getPackageJson = require("./getPackageJson");
 
-const {
-  version,
-  name,
-  license,
-} = getPackageJson('version', 'name', 'license');
+const { version, name, license } = getPackageJson("version", "name", "license");
 
 const banner = `
 [file]
-Litepicker v${version} (https://github.com/wakirin/Litepicker)
-Package: ${name} (https://www.npmjs.com/package/litepicker)
-License: ${license} (https://github.com/wakirin/Litepicker/blob/master/LICENCE.md)
-Copyright 2019-${new Date().getFullYear()} Rinat G.
+Litepicker v${version} (https://github.com/chinthakadarshana1/Litepicker)
+Package: ${name} (https://github.com/chinthakadarshana1/Litepicker)
+License: ${license} (https://github.com/chinthakadarshana1/Litepicker/blob/master/LICENCE.md)
+This is a fork of https://github.com/wakirin/Litepicker.
     
 Hash: [hash]
 `;

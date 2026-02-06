@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Litepicker Example</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                padding: 24px;
+            }
+            .field {
+                margin-bottom: 12px;
+            }
+            input {
+                padding: 8px 10px;
+                width: 240px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Litepicker Example</h1>
+
+        <div class="field">
+            <label for="start">Start date</label><br />
+            <input id="start" type="text" placeholder="YYYY-MM-DD" />
+        </div>
+
+        <div class="field">
+            <label for="end">End date</label><br />
+            <input id="end" type="text" placeholder="YYYY-MM-DD" />
+        </div>
+
+        <script src="./dist/litepicker.js"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                // Prepare initial dates if provided
+                const litepickerConfig = {
+                    element: document.getElementById("start"),
+                    elementEnd: document.getElementById("end"),
+
+                    // RESPONSIVE CONFIG
+                    numberOfMonths: 2,
+                    numberOfColumns: 2,
+
+                    // CORE SETTINGS
+                    singleMode: false,
+                    minDate: new Date(),
+                    format: "MMMM DD",
+
+                    // POSITIONING
+                    position: "bottom",
+                    inlineMode: false,
+
+                    // BOOKING UX
+                    tooltipText: {
+                        one: "night",
+                        other: "nights",
+                    },
+                    tooltipNumber: (totalDays) => totalDays - 1,
+
+                    // STYLING
+                    mobileFriendly: true,
+
+                    // CALLBACKS
+                    setup: (picker) => {
+                        picker.on("selected", (date1, date2) => {
+                            console.log("Selected dates:", date1, date2);
+                        });
+
+                        picker.on("clear:selection", () => {
+                            console.log("Selection cleared");
+                        });
+                    },
+                };
+
+                const picker = new Litepicker(litepickerConfig);
+                // Example: programmatically set a date range
+                // picker.setDateRange('2026-02-01', '2026-02-10');
+            });
+        </script>
+    </body>
+</html>
