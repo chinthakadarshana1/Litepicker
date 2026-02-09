@@ -16,19 +16,25 @@
                 padding: 8px 10px;
                 width: 240px;
             }
+            .row {
+                display: flex;
+                gap: 24px;
+            }
         </style>
     </head>
     <body>
         <h1>Litepicker Example</h1>
 
-        <div class="field">
-            <label for="start">Start date</label><br />
-            <input id="start" type="text" placeholder="YYYY-MM-DD" />
-        </div>
+        <div class="row">
+            <div class="field">
+                <label for="start">Start date</label><br />
+                <input id="start" type="text" placeholder="YYYY-MM-DD" />
+            </div>
 
-        <div class="field">
-            <label for="end">End date</label><br />
-            <input id="end" type="text" placeholder="YYYY-MM-DD" />
+            <div class="field">
+                <label for="end">End date</label><br />
+                <input id="end" type="text" placeholder="YYYY-MM-DD" />
+            </div>
         </div>
 
         <script src="./dist/litepicker.js"></script>
@@ -53,11 +59,14 @@
                     inlineMode: false,
 
                     // BOOKING UX
-                    tooltipText: {
+                    /* tooltipText: {
                         one: "night",
                         other: "nights",
                     },
-                    tooltipNumber: (totalDays) => totalDays - 1,
+                    tooltipNumber: (totalDays) => totalDays - 1, */
+                    //allowRepick: true,
+                    // autoRefresh: true,
+                    //autoapply: true,
 
                     // STYLING
                     mobileFriendly: true,
