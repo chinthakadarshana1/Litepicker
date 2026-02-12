@@ -164,6 +164,21 @@ export class Litepicker extends Calendar {
             } else {
                 this.options.element.value = `${startValue}${this.options.delimiter}${endValue}`;
             }
+        } else if (!this.options.singleMode && this.options.elementEnd instanceof HTMLInputElement) {
+            // Handle case when only one date is set (independent inputs)
+            if (startDate && !endDate) {
+                this.options.element.value = startDate.format(
+                    this.options.format,
+                    this.options.lang,
+                );
+                this.options.elementEnd.value = "";
+            } else if (!startDate && endDate) {
+                this.options.element.value = "";
+                this.options.elementEnd.value = endDate.format(
+                    this.options.format,
+                    this.options.lang,
+                );
+            }
         }
 
         if (!startDate && !endDate) {
@@ -250,56 +265,112 @@ export class Litepicker extends Calendar {
 
             const clickedDate = new DateTime(target.dataset.time);
 
+            // Handle independent date selection when elementEnd exists
             if (
                 this.options.elementEnd &&
                 !this.options.singleMode &&
-                this.options.startDate &&
-                this.options.endDate &&
                 this.triggerElement
             ) {
-                let newStartDate = (this.options.startDate as DateTime).clone();
-                let newEndDate = (this.options.endDate as DateTime).clone();
+                // Case 1: Both dates already exist - update one date independently
+                if (this.options.startDate && this.options.endDate) {
+                    let newStartDate = (this.options.startDate as DateTime).clone();
+                    let newEndDate = (this.options.endDate as DateTime).clone();
 
-                if (this.triggerElement === this.options.element) {
-                    newStartDate = clickedDate.clone();
-                } else if (this.triggerElement === this.options.elementEnd) {
-                    newEndDate = clickedDate.clone();
-                }
-
-                if (newStartDate.getTime() > newEndDate.getTime()) {
-                    const tempDate = newStartDate.clone();
-                    newStartDate = newEndDate.clone();
-                    newEndDate = tempDate.clone();
-                }
-
-                if (this.options.disallowLockDaysInRange) {
-                    const locked = rangeIsLocked(
-                        [newStartDate, newEndDate],
-                        this.options,
-                    );
-                    if (locked) {
-                        this.emit("error:range", [newStartDate, newEndDate]);
-                        return;
+                    if (this.triggerElement === this.options.element) {
+                        newStartDate = clickedDate.clone();
+                    } else if (this.triggerElement === this.options.elementEnd) {
+                        newEndDate = clickedDate.clone();
                     }
+
+                    if (newStartDate.getTime() > newEndDate.getTime()) {
+                        const tempDate = newStartDate.clone();
+                        newStartDate = newEndDate.clone();
+                        newEndDate = tempDate.clone();
+                    }
+
+                    if (this.options.disallowLockDaysInRange) {
+                        const locked = rangeIsLocked(
+                            [newStartDate, newEndDate],
+                            this.options,
+                        );
+                        if (locked) {
+                            this.emit("error:range", [newStartDate, newEndDate]);
+                            return;
+                        }
+                    }
+
+                    this.datePicked = [newStartDate.clone(), newEndDate.clone()];
+
+                    if (this.options.autoApply) {
+                        this.setDateRange(newStartDate, newEndDate);
+                        this.hide();
+                    } else {
+                        this.options.startDate = newStartDate;
+                        this.options.endDate = newEndDate;
+                        this.updateInput();
+                        this.render();
+                        this.emit(
+                            "preselect",
+                            newStartDate.clone(),
+                            newEndDate.clone(),
+                        );
+                    }
+                    return;
                 }
 
-                this.datePicked = [newStartDate.clone(), newEndDate.clone()];
+                // Case 2: Initial state or one date exists - update textbox immediately
+                if (this.shouldResetDatePicked()) {
+                    this.datePicked.length = 0;
+                }
 
-                if (this.options.autoApply) {
-                    this.setDateRange(newStartDate, newEndDate);
-                    this.hide();
-                } else {
-                    this.options.startDate = newStartDate;
-                    this.options.endDate = newEndDate;
+                this.datePicked[this.datePicked.length] = clickedDate;
+
+                // Update the appropriate textbox immediately
+                if (this.datePicked.length === 1) {
+                    if (this.triggerElement === this.options.element) {
+                        this.options.startDate = clickedDate.clone();
+                    } else if (this.triggerElement === this.options.elementEnd) {
+                        this.options.endDate = clickedDate.clone();
+                    }
                     this.updateInput();
                     this.render();
-                    this.emit(
-                        "preselect",
-                        newStartDate.clone(),
-                        newEndDate.clone(),
-                    );
+                    this.emit("preselect", clickedDate.clone());
+                    return;
                 }
-                return;
+
+                // Second date clicked - complete the range
+                if (this.datePicked.length === 2) {
+                    let newStartDate = this.datePicked[0].clone();
+                    let newEndDate = this.datePicked[1].clone();
+
+                    if (newStartDate.getTime() > newEndDate.getTime()) {
+                        const tempDate = newStartDate.clone();
+                        newStartDate = newEndDate.clone();
+                        newEndDate = tempDate.clone();
+                    }
+
+                    if (this.shouldCheckLockDays()) {
+                        const locked = rangeIsLocked([newStartDate, newEndDate], this.options);
+                        if (locked) {
+                            this.emit("error:range", [newStartDate, newEndDate]);
+                            this.datePicked.length = 0;
+                            this.render();
+                            return;
+                        }
+                    }
+
+                    if (this.options.autoApply) {
+                        this.setDateRange(newStartDate, newEndDate);
+                        this.hide();
+                    } else {
+                        this.options.startDate = newStartDate;
+                        this.options.endDate = newEndDate;
+                        this.updateInput();
+                        this.render();
+                        this.emit("preselect", newStartDate.clone(), newEndDate.clone());
+                    }
+                    return;
+                }
             }
 
             if (this.shouldResetDatePicked()) {
