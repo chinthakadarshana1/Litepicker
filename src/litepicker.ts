@@ -248,13 +248,65 @@ export class Litepicker extends Calendar {
                 return;
             }
 
+            const clickedDate = new DateTime(target.dataset.time);
+
+            if (
+                this.options.elementEnd &&
+                !this.options.singleMode &&
+                this.options.startDate &&
+                this.options.endDate &&
+                this.triggerElement
+            ) {
+                let newStartDate = (this.options.startDate as DateTime).clone();
+                let newEndDate = (this.options.endDate as DateTime).clone();
+
+                if (this.triggerElement === this.options.element) {
+                    newStartDate = clickedDate.clone();
+                } else if (this.triggerElement === this.options.elementEnd) {
+                    newEndDate = clickedDate.clone();
+                }
+
+                if (newStartDate.getTime() > newEndDate.getTime()) {
+                    const tempDate = newStartDate.clone();
+                    newStartDate = newEndDate.clone();
+                    newEndDate = tempDate.clone();
+                }
+
+                if (this.options.disallowLockDaysInRange) {
+                    const locked = rangeIsLocked(
+                        [newStartDate, newEndDate],
+                        this.options,
+                    );
+                    if (locked) {
+                        this.emit("error:range", [newStartDate, newEndDate]);
+                        return;
+                    }
+                }
+
+                this.datePicked = [newStartDate.clone(), newEndDate.clone()];
+
+                if (this.options.autoApply) {
+                    this.setDateRange(newStartDate, newEndDate);
+                    this.hide();
+                } else {
+                    this.options.startDate = newStartDate;
+                    this.options.endDate = newEndDate;
+                    this.updateInput();
+                    this.render();
+                    this.emit(
+                        "preselect",
+                        newStartDate.clone(),
+                        newEndDate.clone(),
+                    );
+                }
+                return;
+            }
+
             if (this.shouldResetDatePicked()) {
                 this.datePicked.length = 0;
             }
 
-            this.datePicked[this.datePicked.length] = new DateTime(
-                target.dataset.time,
-            );
+            this.datePicked[this.datePicked.length] = clickedDate;
 
             if (this.shouldSwapDatePicked()) {
                 const tempDate = this.datePicked[1].clone();
@@ -360,6 +412,12 @@ export class Litepicker extends Calendar {
                 this.datePicked.length === 2
             ) {
                 this.setDateRange(this.datePicked[0], this.datePicked[1]);
+            } else if (
+                !this.options.singleMode &&
+                this.options.startDate &&
+                this.options.endDate
+            ) {
+                this.setDateRange(this.options.startDate, this.options.endDate);
             }
 
             this.hide();
@@ -422,7 +480,7 @@ export class Litepicker extends Calendar {
     private shouldAllowRepick() {
         return (
             this.options.elementEnd &&
-            this.options.allowRepick &&
+            (this.options.allowRepick || true) && // Always allow repick when elementEnd exists
             this.options.startDate &&
             this.options.endDate
         );
@@ -529,6 +587,15 @@ export class Litepicker extends Calendar {
 
     private onMouseLeave(event) {
         const target = event.target as any;
+
+        if (
+            this.options.elementEnd &&
+            this.options.startDate &&
+            this.options.endDate &&
+            this.triggerElement
+        ) {
+            return;
+        }
 
         if (
             !this.options.allowRepick ||
