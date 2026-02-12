@@ -273,47 +273,64 @@ export class Litepicker extends Calendar {
             ) {
                 // Case 1: Both dates already exist - update one date independently
                 if (this.options.startDate && this.options.endDate) {
-                    let newStartDate = (this.options.startDate as DateTime).clone();
-                    let newEndDate = (this.options.endDate as DateTime).clone();
-
                     if (this.triggerElement === this.options.element) {
-                        newStartDate = clickedDate.clone();
+                        // Editing start date
+                        const newStartDate = clickedDate.clone();
+                        const existingEndDate = (this.options.endDate as DateTime);
+                        
+                        if (newStartDate.getTime() > existingEndDate.getTime()) {
+                            // Reset end date if new start date is greater
+                            this.options.startDate = newStartDate;
+                            this.options.endDate = null;
+                            this.datePicked = [newStartDate.clone()];
+                        } else {
+                            // Valid range
+                            if (this.options.disallowLockDaysInRange) {
+                                const locked = rangeIsLocked([newStartDate, existingEndDate], this.options);
+                                if (locked) {
+                                    this.emit("error:range", [newStartDate, existingEndDate]);
+                                    return;
+                                }
+                            }
+                            this.options.startDate = newStartDate;
+                            this.datePicked = [newStartDate.clone(), existingEndDate.clone()];
+                        }
                     } else if (this.triggerElement === this.options.elementEnd) {
-                        newEndDate = clickedDate.clone();
-                    }
-
-                    if (newStartDate.getTime() > newEndDate.getTime()) {
-                        const tempDate = newStartDate.clone();
-                        newStartDate = newEndDate.clone();
-                        newEndDate = tempDate.clone();
-                    }
-
-                    if (this.options.disallowLockDaysInRange) {
-                        const locked = rangeIsLocked(
-                            [newStartDate, newEndDate],
-                            this.options,
-                        );
-                        if (locked) {
-                            this.emit("error:range", [newStartDate, newEndDate]);
-                            return;
+                        // Editing end date
+                        const newEndDate = clickedDate.clone();
+                        const existingStartDate = (this.options.startDate as DateTime);
+                        
+                        if (newEndDate.getTime() < existingStartDate.getTime()) {
+                            // Reset start date if new end date is less
+                            this.options.startDate = null;
+                            this.options.endDate = newEndDate;
+                            this.datePicked = [newEndDate.clone()];
+                        } else {
+                            // Valid range
+                            if (this.options.disallowLockDaysInRange) {
+                                const locked = rangeIsLocked([existingStartDate, newEndDate], this.options);
+                                if (locked) {
+                                    this.emit("error:range", [existingStartDate, newEndDate]);
+                                    return;
+                                }
+                            }
+                            this.options.endDate = newEndDate;
+                            this.datePicked = [existingStartDate.clone(), newEndDate.clone()];
                         }
                     }
 
-                    this.datePicked = [newStartDate.clone(), newEndDate.clone()];
-
-                    if (this.options.autoApply) {
-                        this.setDateRange(newStartDate, newEndDate);
+                    this.updateInput();
+                    this.render();
+                    
+                    if (this.options.autoApply && this.options.startDate && this.options.endDate) {
+                        this.setDateRange(this.options.startDate, this.options.endDate);
                         this.hide();
                     } else {
-                        this.options.startDate = newStartDate;
-                        this.options.endDate = newEndDate;
-                        this.updateInput();
-                        this.render();
-                        this.emit(
-                            "preselect",
-                            newStartDate.clone(),
-                            newEndDate.clone(),
-                        );
+                        if (this.options.startDate && this.options.endDate) {
+                            this.emit("preselect", (this.options.startDate as DateTime).clone(), (this.options.endDate as DateTime).clone());
+                        } else if (this.options.startDate || this.options.endDate) {
+                            this.emit("preselect", ((this.options.startDate || this.options.endDate) as DateTime).clone());
+                        }
                     }
                     return;
                 }
@@ -340,13 +357,19 @@ export class Litepicker extends Calendar {
 
                 // Second date clicked - complete the range
                 if (this.datePicked.length === 2) {
-                    let newStartDate = this.datePicked[0].clone();
-                    let newEndDate = this.datePicked[1].clone();
+                    const firstDate = this.datePicked[0].clone();
+                    const secondDate = this.datePicked[1].clone();
 
-                    if (newStartDate.getTime() > newEndDate.getTime()) {
-                        const tempDate = newStartDate.clone();
-                        newStartDate = newEndDate.clone();
-                        newEndDate = tempDate.clone();
+                    // Determine which is start and which is end
+                    let newStartDate: DateTime;
+                    let newEndDate: DateTime;
+                    
+                    if (firstDate.getTime() <= secondDate.getTime()) {
+                        newStartDate = firstDate;
+                        newEndDate = secondDate;
+                    } else {
+                        newStartDate = secondDate;
+                        newEndDate = firstDate;
                     }
 
                     if (this.shouldCheckLockDays()) {
