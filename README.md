@@ -1,11 +1,22 @@
-[![npm version](https://badge.fury.io/js/litepicker.svg)](https://www.npmjs.com/package/litepicker) [![Build Status](https://travis-ci.org/wakirin/Litepicker.svg?branch=master)](https://travis-ci.org/wakirin/Litepicker) [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/wakirin/Litepicker/blob/master/README.md)
-
-Litepicker
+Litepicker - Enhanced Fork
 =========
 
 Date range picker - lightweight, no dependencies
 
-## Features
+> **Note:** This is an enhanced fork of the original [Litepicker](https://github.com/wakirin/Litepicker) project by [wakirin](https://github.com/wakirin). All credit for the original implementation goes to the original authors.
+
+## About This Fork
+
+This fork includes enhanced features for improved independent start/end date selection with separate input fields:
+
+* **Independent date editing** - Edit start and end dates independently when both `element` and `elementEnd` are defined
+* **Real-time updates** - Input fields update immediately upon date selection
+* **Smart date validation** - Invalid date ranges are handled by resetting the conflicting date
+* **Initial state support** - Textboxes update correctly even when selecting the first date
+
+All original Litepicker features are preserved and functional.
+
+## Original Features
 * No dependencies
 * Single date or date range
 * Show multiple months
@@ -18,15 +29,43 @@ Date range picker - lightweight, no dependencies
 * Mobile friendly (with plugin)
 * Predefined ranges (with plugin)
 * Multiple select (with plugin)
-  
-See more details in docs.
 
-# [Documentation](https://litepicker.com)
+## Installation
+
+```bash
+npm install
+npm run prod
+```
+
+## Usage with Enhanced Features
+
+To take advantage of the enhanced independent date selection:
+
+```javascript
+const picker = new Litepicker({
+  element: document.getElementById('start-date'),
+  elementEnd: document.getElementById('end-date'),
+  singleMode: false,
+  // ... other options
+});
+```
+
+**Key behaviors:**
+- Click on start input and select a date → start field updates immediately
+- Click on end input and select a date → end field updates immediately  
+- If start date > end date → end date is reset (cleared)
+- If end date < start date → start date is reset (cleared)
+
+See [FORK_CHANGES.md](./FORK_CHANGES.md) for detailed implementation notes.
+
+## Documentation
+
+For general documentation on Litepicker features and API, refer to the [original documentation](https://litepicker.com).
 
 ## Compatibility
 
 ##### Desktop
-- IE 11 (required [polyfills](https://github.com/wakirin/litepicker-polyfills-ie11))
+- IE 11 (required polyfills)
 - Edge 17+
 - Chrome 60+
 - Firefox 52+
@@ -44,21 +83,32 @@ See more details in docs.
   - UC Browser
 
 ## Plugins
-* [keyboardnav](https://litepicker.com/docs/plugins/keyboardnav/) - adds keyboard navigation.
-* [mobilefriendly](https://litepicker.com/docs/plugins/mobilefriendly/) - adds swipes (left/right) to switch months.
-* [ranges](https://litepicker.com/docs/plugins/ranges/) - adds predefined ranges.
-* [multiselect](https://litepicker.com/docs/plugins/multiselect/) - adds multiple selection.
 
-## See also:
-* [Drupal module](https://www.drupal.org/project/date_range_picker) by [kviolka](https://github.com/kviolka)
-* [Wordpress Ninja forms](https://github.com/soderlind/date-range-ninja-forms) by [soderlind](https://github.com/soderlind)
-* [ember-litepicker](https://github.com/sinankeskin/ember-litepicker) by [sinankeskin](https://github.com/sinankeskin)
+All original Litepicker plugins are supported:
 
-## Supporting Litepicker
-[![](https://github.com/wakirin/Litepicker/blob/gh-pages/assets/images/coffee.png?raw=true)](https://ko-fi.com/wakirin)
+* **keyboardnav** - adds keyboard navigation
+* **mobilefriendly** - adds swipes (left/right) to switch months
+* **ranges** - adds predefined ranges
+* **multiselect** - adds multiple selection
+* **halfrange** - adds half range selection
 
-## Tested on real browsers
-Tested on real browsers via BrowserStack.  
-Thanks to the BrowserStack for supporting the open-source projects.  
+Refer to the [original documentation](https://litepicker.com/docs/plugins/) for plugin usage details.
 
-[![](https://github.com/wakirin/Litepicker/blob/gh-pages/assets/images/Browserstack-logo.png?raw=true)](https://www.browserstack.com/)
+## Credits
+
+This project is a fork of [Litepicker](https://github.com/wakirin/Litepicker) created by [wakirin](https://github.com/wakirin).
+
+Special thanks to:
+- The original Litepicker authors and contributors
+- The open-source community
+
+## License
+
+This project maintains the same license as the original Litepicker project.
+
+## Original Project
+
+To support the original Litepicker project and its author, please visit:
+- [Original Repository](https://github.com/wakirin/Litepicker)
+- [Official Documentation](https://litepicker.com)
+- [Support the Original Author](https://ko-fi.com/wakirin)
