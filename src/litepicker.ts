@@ -406,6 +406,10 @@ export class Litepicker extends Calendar {
                     this.render();
 
                     if (this.options.startDate && this.options.endDate) {
+                        this.setDateRange(
+                            this.options.startDate,
+                            this.options.endDate,
+                        );
                         this.emit(
                             "selected",
                             this.getStartDate(),
