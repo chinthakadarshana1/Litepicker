@@ -384,7 +384,7 @@ export class Litepicker extends Calendar {
                     return;
                 }
 
-                debugger;
+                //debugger;
 
                 // Case 2: Initial state or one date exists - update textbox immediately
                 if (this.shouldResetDatePicked()) {
@@ -404,14 +404,16 @@ export class Litepicker extends Calendar {
                     }
                     this.updateInput();
                     this.render();
-                    this.emit("preselect", clickedDate.clone());
 
-                    console.log(
-                        "Independent date 4 selection triggered",
-                        this.datePicked.length,
-                        this.options.startDate,
-                        this.options.endDate,
-                    );
+                    if (this.options.startDate && this.options.endDate) {
+                        this.emit(
+                            "selected",
+                            this.getStartDate(),
+                            this.getEndDate(),
+                        );
+                    } else {
+                        this.emit("preselect", clickedDate.clone());
+                    }
 
                     return;
                 }
