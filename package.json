@@ -6,10 +6,12 @@
     "types": "./dist/types/index.d.ts",
     "scripts": {
         "prod": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --config config/webpack.prod.js",
-        "dev": "webpack --config config/webpack.dev.js",
-        "nocss": "webpack --config config/webpack.nocss.js",
-        "plugins": "webpack --config config/webpack.plugins.js && webpack --config config/webpack.plugins.nocss.js",
-        "watch": "webpack -w --config config/webpack.dev.js",
+        "dev": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --config config/webpack.dev.js",
+        "nocss": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --config config/webpack.nocss.js",
+        "plugins": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --config config/webpack.plugins.js && cross-env NODE_OPTIONS=--openssl-legacy-provider  webpack --config config/webpack.plugins.nocss.js",
+        "watch": "concurrently \"npm run watch:webpack\" \"npm run watch:serve\"",
+        "watch:webpack": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack -w --config config/webpack.dev.js",
+        "watch:serve": "browser-sync start --server --files \"dist/**/*.js, example.html\" --startPath \"/example.html\" --port 3000 --no-notify",
         "test": "jest"
     },
     "keywords": [
@@ -50,6 +52,8 @@
         "@types/node": "^12.12.7",
         "autoprefixer": "^9.7.2",
         "babel-loader": "^8.2.2",
+        "browser-sync": "^3.0.4",
+        "concurrently": "^9.2.1",
         "cross-env": "^7.0.3",
         "css-loader": "^3.6.0",
         "dts-css-modules-loader": "^1.0.1",
@@ -64,6 +68,7 @@
         "sass": "^1.42.1",
         "sass-loader": "^8.0.0",
         "style-loader": "^1.0.0",
+        "terser-webpack-plugin": "^4.2.3",
         "ts-jest": "^24.2.0",
         "ts-loader": "^6.2.1",
         "tslint": "^5.20.1",
