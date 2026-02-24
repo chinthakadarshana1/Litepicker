@@ -164,7 +164,10 @@ export class Litepicker extends Calendar {
             } else {
                 this.options.element.value = `${startValue}${this.options.delimiter}${endValue}`;
             }
-        } else if (!this.options.singleMode && this.options.elementEnd instanceof HTMLInputElement) {
+        } else if (
+            !this.options.singleMode &&
+            this.options.elementEnd instanceof HTMLInputElement
+        ) {
             // Handle case when only one date is set (independent inputs)
             if (startDate && !endDate) {
                 this.options.element.value = startDate.format(
@@ -276,9 +279,12 @@ export class Litepicker extends Calendar {
                     if (this.triggerElement === this.options.element) {
                         // Editing start date
                         const newStartDate = clickedDate.clone();
-                        const existingEndDate = (this.options.endDate as DateTime);
-                        
-                        if (newStartDate.getTime() > existingEndDate.getTime()) {
+                        const existingEndDate = this.options
+                            .endDate as DateTime;
+
+                        if (
+                            newStartDate.getTime() > existingEndDate.getTime()
+                        ) {
                             // Reset end date if new start date is greater
                             this.options.startDate = newStartDate;
                             this.options.endDate = null;
@@ -286,21 +292,35 @@ export class Litepicker extends Calendar {
                         } else {
                             // Valid range
                             if (this.options.disallowLockDaysInRange) {
-                                const locked = rangeIsLocked([newStartDate, existingEndDate], this.options);
+                                const locked = rangeIsLocked(
+                                    [newStartDate, existingEndDate],
+                                    this.options,
+                                );
                                 if (locked) {
-                                    this.emit("error:range", [newStartDate, existingEndDate]);
+                                    this.emit("error:range", [
+                                        newStartDate,
+                                        existingEndDate,
+                                    ]);
                                     return;
                                 }
                             }
                             this.options.startDate = newStartDate;
-                            this.datePicked = [newStartDate.clone(), existingEndDate.clone()];
+                            this.datePicked = [
+                                newStartDate.clone(),
+                                existingEndDate.clone(),
+                            ];
                         }
-                    } else if (this.triggerElement === this.options.elementEnd) {
+                    } else if (
+                        this.triggerElement === this.options.elementEnd
+                    ) {
                         // Editing end date
                         const newEndDate = clickedDate.clone();
-                        const existingStartDate = (this.options.startDate as DateTime);
-                        
-                        if (newEndDate.getTime() < existingStartDate.getTime()) {
+                        const existingStartDate = this.options
+                            .startDate as DateTime;
+
+                        if (
+                            newEndDate.getTime() < existingStartDate.getTime()
+                        ) {
                             // Reset start date if new end date is less
                             this.options.startDate = null;
                             this.options.endDate = newEndDate;
@@ -308,28 +328,57 @@ export class Litepicker extends Calendar {
                         } else {
                             // Valid range
                             if (this.options.disallowLockDaysInRange) {
-                                const locked = rangeIsLocked([existingStartDate, newEndDate], this.options);
+                                const locked = rangeIsLocked(
+                                    [existingStartDate, newEndDate],
+                                    this.options,
+                                );
                                 if (locked) {
-                                    this.emit("error:range", [existingStartDate, newEndDate]);
+                                    this.emit("error:range", [
+                                        existingStartDate,
+                                        newEndDate,
+                                    ]);
                                     return;
                                 }
                             }
                             this.options.endDate = newEndDate;
-                            this.datePicked = [existingStartDate.clone(), newEndDate.clone()];
+                            this.datePicked = [
+                                existingStartDate.clone(),
+                                newEndDate.clone(),
+                            ];
                         }
                     }
 
                     this.updateInput();
                     this.render();
-                    
-                    if (this.options.autoApply && this.options.startDate && this.options.endDate) {
-                        this.setDateRange(this.options.startDate, this.options.endDate);
+
+                    if (
+                        this.options.autoApply &&
+                        this.options.startDate &&
+                        this.options.endDate
+                    ) {
+                        this.setDateRange(
+                            this.options.startDate,
+                            this.options.endDate,
+                        );
                         this.hide();
                     } else {
                         if (this.options.startDate && this.options.endDate) {
-                            this.emit("preselect", (this.options.startDate as DateTime).clone(), (this.options.endDate as DateTime).clone());
-                        } else if (this.options.startDate || this.options.endDate) {
-                            this.emit("preselect", ((this.options.startDate || this.options.endDate) as DateTime).clone());
+                            this.emit(
+                                "preselect",
+                                (this.options.startDate as DateTime).clone(),
+                                (this.options.endDate as DateTime).clone(),
+                            );
+                        } else if (
+                            this.options.startDate ||
+                            this.options.endDate
+                        ) {
+                            this.emit(
+                                "preselect",
+                                (
+                                    (this.options.startDate ||
+                                        this.options.endDate) as DateTime
+                                ).clone(),
+                            );
                         }
                     }
                     return;
@@ -346,7 +395,9 @@ export class Litepicker extends Calendar {
                 if (this.datePicked.length === 1) {
                     if (this.triggerElement === this.options.element) {
                         this.options.startDate = clickedDate.clone();
-                    } else if (this.triggerElement === this.options.elementEnd) {
+                    } else if (
+                        this.triggerElement === this.options.elementEnd
+                    ) {
                         this.options.endDate = clickedDate.clone();
                     }
                     this.updateInput();
@@ -363,7 +414,7 @@ export class Litepicker extends Calendar {
                     // Determine which is start and which is end
                     let newStartDate: DateTime;
                     let newEndDate: DateTime;
-                    
+
                     if (firstDate.getTime() <= secondDate.getTime()) {
                         newStartDate = firstDate;
                         newEndDate = secondDate;
@@ -373,9 +424,15 @@ export class Litepicker extends Calendar {
                     }
 
                     if (this.shouldCheckLockDays()) {
-                        const locked = rangeIsLocked([newStartDate, newEndDate], this.options);
+                        const locked = rangeIsLocked(
+                            [newStartDate, newEndDate],
+                            this.options,
+                        );
                         if (locked) {
-                            this.emit("error:range", [newStartDate, newEndDate]);
+                            this.emit("error:range", [
+                                newStartDate,
+                                newEndDate,
+                            ]);
                             this.datePicked.length = 0;
                             this.render();
                             return;
@@ -390,7 +447,11 @@ export class Litepicker extends Calendar {
                         this.options.endDate = newEndDate;
                         this.updateInput();
                         this.render();
-                        this.emit("preselect", newStartDate.clone(), newEndDate.clone());
+                        this.emit(
+                            "preselect",
+                            newStartDate.clone(),
+                            newEndDate.clone(),
+                        );
                     }
                     return;
                 }
