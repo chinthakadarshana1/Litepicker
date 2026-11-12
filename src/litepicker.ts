@@ -251,6 +251,13 @@ export class Litepicker extends Calendar {
             return;
         }
 
+        if (
+            this.options.element.matches(":disabled") ||
+            this.options.elementEnd?.matches(":disabled")
+        ) {
+            return;
+        }
+
         this.emit("before:click", target);
 
         if (this.preventClick) {
